@@ -88,8 +88,33 @@ static void handleSerialCommand(String cmd) {
         changed = true;
         Serial.println("[CMD] 外部设备复位控制 (RST_CTR) 已关闭");
     }
+    else if (key == "GET_CFG" || cmd == "GET_CFG") {
+        Serial.printf("[CFG] IMAX=%.2f, IMIN=%.2f, ISTART=%.2f, VOUT=%.2f, DELAY=%d, IOFFSET=%.4f, NAME=%s, RSTON=%d, RSTOFF=%d, EN_RST=%d\n",
+            SystemState::config.I_MAX,
+            SystemState::config.I_MIN,
+            SystemState::config.I_Start,
+            SystemState::config.SET_VOUT,
+            SystemState::config.DelayStart_ms,
+            SystemState::config.I_Offset,
+            SystemState::config.deviceName,
+            SystemState::config.RSTON_TIME,
+            SystemState::config.RSTOFF_TIME,
+            SystemState::config.EN_RST ? 1 : 0
+        );
+    }
+    else if (key == "FORMAT_NVS" || cmd == "FORMAT_NVS") {
+        NVSManager::format();
+        Serial.println("[CMD] NVS 已格式化! 系统即将重启...");
+        delay(500);
+        ESP.restart();
+    }
+    else if (key == "REBOOT" || cmd == "REBOOT") {
+        Serial.println("[CMD] 系统即将重启...");
+        delay(500);
+        ESP.restart();
+    }
     else {
-        Serial.println("[CMD] 未知命令! 支持: VOUT, IMAX, IMIN, ISTART, DELAY, CALIB_I, NAME, RSTON_TIME, RSTOFF_TIME, OPEN_RST, CLOSE_RST");
+        Serial.println("[CMD] 未知命令! 支持: VOUT, IMAX, IMIN, ISTART, DELAY, CALIB_I, NAME, RSTON_TIME, RSTOFF_TIME, OPEN_RST, CLOSE_RST, GET_CFG, FORMAT_NVS, REBOOT");
     }
     
     if (changed) {
